@@ -1,12 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CodeChallenge1.Models;
+using Microsoft.AspNetCore.Mvc;
 
-namespace CodeChallenge1.Controllers
+namespace UserInfo.API.Controllers
 {
+    [ApiController]
+    [Route("api/users")]
     public class UserController : Controller
     {
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
+
+        [HttpGet]
+        public ActionResult<IEnumerable<UserDto>> GetUsers()
         {
-            return View();
+            return Ok(UsersDataStore.Current.Users);
         }
     }
 }

@@ -17,5 +17,23 @@ namespace UserInfo.API.Controllers
         {
             return Ok(UsersDataStore.Current.Users);
         }
+
+       
+        [HttpGet("{id}")]
+        public ActionResult<UserDto> GetUser(int id)
+        {
+            // Find user
+            var user = UsersDataStore.Current.Users
+                .FirstOrDefault(c => c.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
+       
     }
 }

@@ -14,16 +14,16 @@ namespace UserInfo.API
             {
                 new UserDto()
                 {
-                     Id = 1,
-                     FirstName = "Keshava",
-                     LastName = "Prasad",
-                     Email = "kpbs@email",
+                     Id = 100,
+                     FirstName = "Spider",
+                     LastName = "Man",
+                     Email = "spider@email",
                      DateOfBirth= new DateTime(1980,1,1)
                     
                 },
                new UserDto()
                 {
-                     Id = 1,
+                     Id = 200,
                      FirstName = "Super",
                      LastName = "Man",
                      Email = "super@email.com",

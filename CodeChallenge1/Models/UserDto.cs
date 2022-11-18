@@ -1,5 +1,7 @@
 ﻿using CodeChallenge1.CustomAttributes;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CodeChallenge1.Models
 {
@@ -14,5 +16,8 @@ namespace CodeChallenge1.Models
         public string? Email { get; set; } = string.Empty;
        
         public DateTime DateOfBirth { get; set; }
+
+        [ReadOnly(true)]        
+        public int Age => DateTime.Today.Year - DateOfBirth.Year;
     }
 }

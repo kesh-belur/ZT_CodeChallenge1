@@ -1,5 +1,6 @@
 ﻿using CodeChallenge1.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace UserInfo.API.Controllers
 {
@@ -35,22 +36,32 @@ namespace UserInfo.API.Controllers
         }
 
         [HttpPost]
+       
         //Implemented properly this will have an Entity class. At this stage, the Entity/Dto is assumed to be the same for simplicity sake
         public ActionResult<UserDto> CreateUser([FromBody] UserCreationDto user) //the body will contain data for creation which will be de-serialized used by UserCreationDTO
         {
-            var newUserID = UsersDataStore.Current.Users.Max(u => u.Id) + 100;
 
-            var newUser = new UserDto()
+            if (ModelState.IsValid) //Not sure why this is not returning false for Overposting / underposting fields
             {
-                Id = newUserID,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
-                Email = user.Email
-            };
-            UsersDataStore.Current.Users.Add(newUser);
-            //go to the newly created user -returns 201 as well
-            return CreatedAtRoute("GetUser", new { id = newUserID }, newUser);
+                var newUserID = UsersDataStore.Current.Users.Max(u => u.Id) + 100;
+
+                var newUser = new UserDto()
+                {
+                    Id = newUserID,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    DateOfBirth = user.DateOfBirth,
+                    Email = user.Email
+                };
+                UsersDataStore.Current.Users.Add(newUser);
+                //go to the newly created user -returns 201 as well
+                return CreatedAtRoute("GetUser", new { id = newUserID }, newUser);
+                //return RedirectToAction("GetUsers");
+            }
+            else
+            {
+                return BadRequest();
+            }
 
         }
         [HttpPut("{userId}")]

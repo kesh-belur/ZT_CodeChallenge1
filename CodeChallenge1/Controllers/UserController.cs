@@ -71,5 +71,19 @@ namespace UserInfo.API.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{userId}")]
+        public ActionResult DeleteUser(int userId)
+        {
+            var userFromStore = UsersDataStore.Current.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (userFromStore == null)
+            {
+                return NotFound();
+            }
+
+            UsersDataStore.Current.Users.Remove(userFromStore);
+
+            return NoContent();
+        }
     }
 }

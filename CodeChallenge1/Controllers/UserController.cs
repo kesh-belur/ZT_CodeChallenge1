@@ -1,6 +1,7 @@
 ﻿using CodeChallenge1.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Net.Mime;
 
 namespace UserInfo.API.Controllers
 {
@@ -8,41 +9,45 @@ namespace UserInfo.API.Controllers
     [Route("api/users")]
     public class UserController : Controller
     {
+        
+
         //public IActionResult Index()
         //{
         //    return View();
         //}
 
         [HttpGet(Name = "GetUsers")]
-        public ActionResult<IEnumerable<UserDto>> GetUsers()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+         public ActionResult<IEnumerable<UserDto>> GetUsers()
         {
             return Ok(UsersDataStore.Current.Users);
+           // return UsersDataStore.Current.Users;
         }
 
 
         [HttpGet("{id}", Name = "GetUser")] //Helps after a new user has been created and can be called into.. See CreateUser method on how thi is used
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<UserDto> GetUser(int id)
         {
             // Find user
             var user = UsersDataStore.Current.Users
                 .FirstOrDefault(c => c.Id == id);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
+            return user != null ? user :NotFound();
+            
         }
 
         [HttpPost]
-       
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+       [ProducesResponseType(StatusCodes.Status400BadRequest)]
         //Implemented properly this will have an Entity class. At this stage, the Entity/Dto is assumed to be the same for simplicity sake
         public ActionResult<UserDto> CreateUser([FromBody] UserCreationDto user) //the body will contain data for creation which will be de-serialized used by UserCreationDTO
+
         {
 
-            if (ModelState.IsValid) //Not sure why this is not returning false for Overposting / underposting fields
-            {
+            
                 var newUserID = UsersDataStore.Current.Users.Max(u => u.Id) + 100;
 
                 var newUser = new UserDto()
@@ -56,12 +61,9 @@ namespace UserInfo.API.Controllers
                 UsersDataStore.Current.Users.Add(newUser);
                 //go to the newly created user -returns 201 as well
                 return CreatedAtRoute("GetUser", new { id = newUserID }, newUser);
-                //return RedirectToAction("GetUsers");
-            }
-            else
-            {
-                return BadRequest();
-            }
+               
+            
+           
 
         }
         [HttpPut("{userId}")]

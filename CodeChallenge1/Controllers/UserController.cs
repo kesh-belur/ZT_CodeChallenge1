@@ -1,24 +1,26 @@
 ﻿using CodeChallenge1.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using System.Net.Mime;
 
 namespace UserInfo.API.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    public class UserController : Controller
+    public class UserController :Controller
     {
-        
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+        private readonly ILogger<UserController> _logger;
+
+        public  UserController(ILogger<UserController> logger)
+        {
+          _logger=logger?? throw new ArgumentNullException(nameof(logger));
+        }
 
         [HttpGet(Name = "GetUsers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
          public ActionResult<IEnumerable<UserDto>> GetUsers()
+
         {
             return Ok(UsersDataStore.Current.Users);
            // return UsersDataStore.Current.Users;
@@ -33,8 +35,13 @@ namespace UserInfo.API.Controllers
             // Find user
             var user = UsersDataStore.Current.Users
                 .FirstOrDefault(c => c.Id == id);
-
-            return user != null ? user :NotFound();
+            if (user==null)
+            {
+                _logger.LogInformation($"User with ID {id} was not found");
+                return NotFound();
+            }
+            return Ok();
+           // return user != null ? user :NotFound();
             
         }
 
@@ -76,6 +83,10 @@ namespace UserInfo.API.Controllers
                 return NotFound();
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             userFromStore.DateOfBirth = user.DateOfBirth;
             userFromStore.Email = user.Email;
             userFromStore.FirstName = user.FirstName;
@@ -97,6 +108,36 @@ namespace UserInfo.API.Controllers
             UsersDataStore.Current.Users.Remove(userFromStore);
 
             return NoContent();
+        }
+
+        [HttpPatch("{userId}")]
+        public ActionResult PartiallyUpdateUser(int userId,JsonPatchDocument<UserUpdateDto> patchDocument)
+        {
+            var userFromStore=UsersDataStore.Current.Users.FirstOrDefault(u=>u.Id==userId);
+
+            if (userFromStore==null)
+            {
+                return NotFound();
+            }
+
+            
+            var userToPatch = new UserUpdateDto() { Email = userFromStore.Email, FirstName = userFromStore.FirstName };
+            patchDocument.ApplyTo(userToPatch, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!TryValidateModel(userToPatch))
+            {
+                return BadRequest(ModelState);
+            }
+
+            userFromStore.FirstName=userToPatch.FirstName;
+            userFromStore.Email = userToPatch.Email;
+
+                return NoContent();
         }
     }
 }

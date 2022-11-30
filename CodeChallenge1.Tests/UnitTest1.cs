@@ -55,6 +55,7 @@ namespace CodeChallenge1.Tests
 
             var controller = new UserController();
             var actionResult = controller.GetUsers();
+            
 
             //Act
             var result = actionResult.Result as OkObjectResult;

@@ -32,16 +32,29 @@ namespace UserInfo.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<UserDto> GetUser(int id)
         {
-            // Find user
-            var user = UsersDataStore.Current.Users
-                .FirstOrDefault(c => c.Id == id);
-            if (user==null)
+            try
             {
-                _logger.LogInformation($"User with ID {id} was not found");
-                return NotFound();
+                //throw new Exception ("Testing Exception handling ");
+                // Find user
+                var user = UsersDataStore.Current.Users
+                .FirstOrDefault(c => c.Id == id);
+                if (user == null)
+                {
+                    _logger.LogInformation($"User with ID {id} was not found");
+                    return NotFound();
+                }
+                return Ok(user);
+                // return user != null ? user :NotFound();
             }
-            return Ok();
-           // return user != null ? user :NotFound();
+            catch (Exception ex)
+            {
+
+                _logger.LogCritical($"Exception while getting user with id {id}",ex);
+                return StatusCode(500, "A problem occured while handling your request.Contact your api provider");
+            }
+
+
+            
             
         }
 

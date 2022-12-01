@@ -1,4 +1,5 @@
 ﻿using CodeChallenge1.Models;
+using CodeChallenge1.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
@@ -11,10 +12,12 @@ namespace UserInfo.API.Controllers
     {
 
         private readonly ILogger<UserController> _logger;
+        private readonly IMailService _mailService;
 
-        public  UserController(ILogger<UserController> logger)
+        public  UserController(ILogger<UserController> logger, IMailService mailService)
         {
           _logger=logger?? throw new ArgumentNullException(nameof(logger));
+            _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
         }
 
         [HttpGet(Name = "GetUsers")]
@@ -119,6 +122,7 @@ namespace UserInfo.API.Controllers
             }
 
             UsersDataStore.Current.Users.Remove(userFromStore);
+            _mailService.Send("User Delete notification", $"User {userFromStore.LastName} has been deleted");
 
             return NoContent();
         }

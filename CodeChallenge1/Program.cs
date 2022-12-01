@@ -1,7 +1,20 @@
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+   .WriteTo.Console()
+   .WriteTo.File("logs/userInfo.log", rollingInterval: RollingInterval.Day)
+   .CreateLogger();
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
+
+//tell Asp.net to use Serilog
+builder.Host.UseSerilog();
 
 // Add services to the container.
 

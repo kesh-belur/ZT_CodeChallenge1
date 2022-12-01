@@ -34,7 +34,7 @@ namespace UserInfo.API.Controllers
         {
             try
             {
-                //throw new Exception ("Testing Exception handling ");
+                throw new Exception("Testing Exception handling ");
                 // Find user
                 var user = UsersDataStore.Current.Users
                 .FirstOrDefault(c => c.Id == id);

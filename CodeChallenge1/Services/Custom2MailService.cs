@@ -2,8 +2,15 @@
 {
     public class Custom2MailService:IMailService
     {
-        private string _mailTo = "admin@company.com";
-        private string _mailFrom = "noreplay@company.com";
+        private readonly string _mailTo = string.Empty;
+        private readonly string _mailFrom = String.Empty;
+
+        public Custom2MailService(IConfiguration configuration)
+        {
+            _mailTo = configuration["mailSettings:mailToAddress"];
+            _mailFrom = configuration["mailSettings:mailFromAddress"];
+
+        }
 
         public void Send(string subject, string message)
         {

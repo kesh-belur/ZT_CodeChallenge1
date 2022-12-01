@@ -2,10 +2,10 @@
 
 namespace UserInfo.API
 { 
-        public class UsersDataStore
+        public  class UsersDataStore
         {
             public List<UserDto> Users { get; set; }
-            public static UsersDataStore Current { get; } = new UsersDataStore();
+           //public static UsersDataStore Current { get; } = new UsersDataStore();
 
             public UsersDataStore()
             {

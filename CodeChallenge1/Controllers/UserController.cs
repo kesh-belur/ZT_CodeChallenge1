@@ -13,11 +13,13 @@ namespace UserInfo.API.Controllers
 
         private readonly ILogger<UserController> _logger;
         private readonly IMailService _mailService;
+        private readonly UsersDataStore _usersDataStore;
 
-        public  UserController(ILogger<UserController> logger, IMailService mailService)
+        public  UserController(ILogger<UserController> logger, IMailService mailService, UsersDataStore usersDataStore)
         {
           _logger=logger?? throw new ArgumentNullException(nameof(logger));
             _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
+            _usersDataStore = usersDataStore?? throw new ArgumentException(nameof(UsersDataStore));
         }
 
         [HttpGet(Name = "GetUsers")]
@@ -25,8 +27,8 @@ namespace UserInfo.API.Controllers
          public ActionResult<IEnumerable<UserDto>> GetUsers()
 
         {
-            return Ok(UsersDataStore.Current.Users);
-           // return UsersDataStore.Current.Users;
+            return Ok(_usersDataStore.Users);
+           // return _usersDataStore.Users;
         }
 
 
@@ -39,7 +41,7 @@ namespace UserInfo.API.Controllers
             {
                 throw new Exception("Testing Exception handling ");
                 // Find user
-                var user = UsersDataStore.Current.Users
+                var user = _usersDataStore.Users
                 .FirstOrDefault(c => c.Id == id);
                 if (user == null)
                 {
@@ -71,7 +73,7 @@ namespace UserInfo.API.Controllers
         {
 
             
-                var newUserID = UsersDataStore.Current.Users.Max(u => u.Id) + 100;
+                var newUserID = _usersDataStore.Users.Max(u => u.Id) + 100;
 
                 var newUser = new UserDto()
                 {
@@ -81,7 +83,7 @@ namespace UserInfo.API.Controllers
                     DateOfBirth = user.DateOfBirth,
                     Email = user.Email
                 };
-                UsersDataStore.Current.Users.Add(newUser);
+                _usersDataStore.Users.Add(newUser);
                 //go to the newly created user -returns 201 as well
                 return CreatedAtRoute("GetUser", new { id = newUserID }, newUser);
                
@@ -92,7 +94,7 @@ namespace UserInfo.API.Controllers
         [HttpPut("{userId}")]
         public ActionResult UpdateUser(int userId,UserUpdateDto user)
         {
-            var userFromStore = UsersDataStore.Current.Users.FirstOrDefault(u => u.Id==userId);
+            var userFromStore = _usersDataStore.Users.FirstOrDefault(u => u.Id==userId);
 
             if (userFromStore==null)
             {
@@ -114,14 +116,14 @@ namespace UserInfo.API.Controllers
         [HttpDelete("{userId}")]
         public ActionResult DeleteUser(int userId)
         {
-            var userFromStore = UsersDataStore.Current.Users.FirstOrDefault(u => u.Id == userId);
+            var userFromStore = _usersDataStore.Users.FirstOrDefault(u => u.Id == userId);
 
             if (userFromStore == null)
             {
                 return NotFound();
             }
 
-            UsersDataStore.Current.Users.Remove(userFromStore);
+            _usersDataStore.Users.Remove(userFromStore);
             _mailService.Send("User Delete notification", $"User {userFromStore.LastName} has been deleted");
 
             return NoContent();
@@ -130,7 +132,7 @@ namespace UserInfo.API.Controllers
         [HttpPatch("{userId}")]
         public ActionResult PartiallyUpdateUser(int userId,JsonPatchDocument<UserUpdateDto> patchDocument)
         {
-            var userFromStore=UsersDataStore.Current.Users.FirstOrDefault(u=>u.Id==userId);
+            var userFromStore=_usersDataStore.Users.FirstOrDefault(u=>u.Id==userId);
 
             if (userFromStore==null)
             {

@@ -1,5 +1,6 @@
 using CodeChallenge1.Services;
 using Serilog;
+using UserInfo.API;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -29,11 +30,15 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Register services
+
 #if DEBUG
 builder.Services.AddTransient<IMailService, CustomMailService>();
 #else
 builder.Services.AddTransient<IMailService, Custom2MailService>();
 #endif
+builder.Services.AddSingleton<UsersDataStore>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

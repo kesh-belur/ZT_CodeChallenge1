@@ -1,4 +1,6 @@
+using CodeChallenge1.DbContexts;
 using CodeChallenge1.Services;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using UserInfo.API;
 
@@ -39,6 +41,9 @@ builder.Services.AddTransient<IMailService, Custom2MailService>();
 #endif
 builder.Services.AddSingleton<UsersDataStore>();
 
+//register context i.e. UserInfoContext
+
+builder.Services.AddDbContext<UserInfoContext>(dbContextOptions => dbContextOptions.UseSqlite("Data Source=UserInfo.db"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
